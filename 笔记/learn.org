@@ -1,16 +1,21 @@
 * Reinforcement Learning
 ** The RL Problem
 *** Sequential Decision Making
-   Goal: select actions to maximise total future reward//
-   Actions may have long term consequences.//
+   Goal: select actions to maximise total future reward
+
+   Actions may have long term consequences.
+
    Reward may be delayed. It may be better to sacrifice immediate reward to gain more long-term reward.
 *** Agent and Environment
 **** At each step /t/ the agent:
-    *Executes action /A_t/ //
-    *Receives observation /O_t/ //
-    *Receives scalar reward /R_t/ //
+    *Executes action /A_t/ 
+
+    *Receives observation /O_t/ 
+
+    *Receives scalar reward /R_t/ 
+
 **** The environment:
-    *Receives action /A_t/ //
-    *Emits observation /O_{t+1}/ //
-    *Emits scalar reward /R_{t+1}/ //
+    *Receives action /A_t/ 
+    *Emits observation /O_{t+1}/ 
+    *Emits scalar reward /R_{t+1}/ 
 **** /t/ increments at env.tep
