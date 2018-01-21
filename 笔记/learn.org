@@ -1,23 +1,41 @@
+#+TITLE:Reinforcement Learning
 * Reinforcement Learning
 ** The RL Problem
 *** Sequential Decision Making
-Goal: select actions to maximise total future reward
+1.Goal: select actions to maximise total future reward
 
-Actions may have long term consequences.
+2.Actions may have long term consequences.
 
-Reward may be delayed. It may be better to sacrifice immediate reward to gain more long-term reward.
+3.Reward may be delayed. It may be better to sacrifice immediate reward to gain more long-term reward.
 *** Agent and Environment
 **** At each step /t/ the agent:
-*Executes action /A_t/
+1.Executes action /A_t/
 
-*Receives observation /O_t/
+2.Receives observation /O_t/
 
-*Receives scalar reward /R_t/ 
+3.Receives scalar reward /R_t/ 
 
 **** The environment:
-*Receives action /A_t/
+1.Receives action /A_t/
 
-*Emits observation /O_{t+1}/
+2.Emits observation /O_{t+1}/
 
-*Emits scalar reward /R_{t+1}/ 
+3.Emits scalar reward /R_{t+1}/ 
 **** /t/ increments at env.tep
+*** History and State
+**** History
+1.The history is the sequence of observations, actions, reward:
+
+$$ /H_t = O_1,R_1,A_1,...,A_{t-1},O_t,R_t/ $$
+
+2.What happens next depends on the history:The agent selects actions. The environment selects observations/rewards.
+
+3.State is the information used to determine what happens next.
+
+4.Formally, state is a function of the history: /S_t = f(H_t)/
+**** Environment State
+1.The environment state /S^e_t/ is the environment's private representation, i.e. whatever data the environment uses to pick the next observation/reward.
+
+2.The environment state is not usually visible to the agent. Even if /S^e_t/ is visible, it may contain irrelevant information.
+**** Agent State
+1. 
