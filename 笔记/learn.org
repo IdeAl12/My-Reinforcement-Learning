@@ -1,4 +1,3 @@
-#+TITLE:Reinforcement Learning
 * Reinforcement Learning
 ** The RL Problem
 *** Sequential Decision Making
