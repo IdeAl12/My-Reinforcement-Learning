@@ -24,18 +24,75 @@
 **** /t/ increments at env.tep
 *** History and State
 **** History
-1.The history is the sequence of observations, actions, reward:
+     1.The history is the sequence of observations, actions, reward:
 
-$$ /H_t = O_1,R_1,A_1,...,A_{t-1},O_t,R_t/ $$
+     $$ /H_t = O_1,R_1,A_1,...,A_{t-1},O_t,R_t/ $$
 
-2.What happens next depends on the history:The agent selects actions. The environment selects observations/rewards.
+     2.What happens next depends on the history:The agent selects actions. The environment selects observations/rewards.
 
-3.State is the information used to determine what happens next.
+     3.State is the information used to determine what happens next.
 
-4.Formally, state is a function of the history: /S_t = f(H_t)/
+     4.Formally, state is a function of the history: /S_t = f(H_t)/
 **** Environment State
-1.The environment state /S^e_t/ is the environment's private representation, i.e. whatever data the environment uses to pick the next observation/reward.
+     1.The environment state /S^e_t/ is the environment's private representation, i.e. whatever data the environment uses to pick the next observation/reward.
 
-2.The environment state is not usually visible to the agent. Even if /S^e_t/ is visible, it may contain irrelevant information.
+     2.The environment state is not usually visible to the agent. Even if /S^e_t/ is visible, it may contain irrelevant information.
 **** Agent State
-1. 
+     The agent state /S^a_t/ is the agent's internal representation. It can be any function of history: /S^a_t = f(H_t)/
+**** Information State
+     An *information state (a.k.a Markov state)* contains all useful information from the history.
+
+     Definition: A state /S_t/ is Markov if and only if: *P[ S_{t+1}|S_t ] = P[ S_{t+1}|S_1,...,S_t ]*
+
+     The future is independent of the past given the present. Once the state is known, the history may be thrown away. i.e. The state is a sufficient statistic of the future. The environment state /S^e_t/ is Markov, the history /H_t/ is Markov.
+**** Fully Obervable Environments
+     Fully observaility: agent directly observes environment state. Formally, this is a *Markov Decision process(MDP)*
+Agent state = environment state = information state
+**** Partially Observable Environments
+     Partial Observaility: agent indirectly observes environment. Formally this is a *partially observable Markov Decision process(POMDP)*
+
+Agent must construct its own state representation /S^a_t/.
+** Inside An RL Agent
+*** Major Components of an RL Agent
+     An RL agent may include one or more of these components: Policy, Value function, Model.
+**** Policy
+     A policy is the agent's behaviour.  It is a map from state to action.
+**** value Function
+     Value function is a prediction of future reward. Used to evaluate the goodness/badnesss of states, and therefore to select between actions.
+**** Model
+     A model predits what the environment will do next(next state, reward). Agent may have an internal model of the environment. The model may be imperfect.
+*** Categorizing RL agents
+1.Value Based: No Policy(implicit). Value Function.
+
+2.Policy Based: Policy. No Value Function.
+
+3.Actor Critic: Policy. Function.
+
+4.Model Free: Policy and/or Value Function. No Model.
+
+5.Model Based: Policy and/or Value Function. Model.
+
+** Problems with RL
+*** Learning and Planning
+Two fundamental problems in sequential decision making
+**** Reinforcement Learning:
+1)The environment is initially unknow.
+
+2)The agent interacts with the environment.
+
+3)The agent improves its policy.
+
+**** Planning:
+1)A model of the environment is known.
+
+2)The agent performs computations with its model(without any external interaction)
+
+3)The agent improves its policy. a.k.a. deliberation, resoning, introspection, pondering, thought, search.
+*** Exploration and Exploitation
+Reinforcement learning is like trial-and-error learning. The agent should discover a good policy from its experiences of the environment, without losing too much reward along the way.
+
+Exploration finds more information about the environment. Exploitation exploits known information to maximise reward. It is usually important to explore as well as exploit.
+*** Prediction and Control
+Prediction: evaluate the future, given a policy
+
+Control: optimise the future, find the best policy
