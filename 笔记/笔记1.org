@@ -1,4 +1,4 @@
-* Reinforcement Learning
+* Reinforcement Learning 1
 ** The RL Problem
 *** Sequential Decision Making
 1.Goal: select actions to maximise total future reward
@@ -95,3 +95,4 @@ Exploration finds more information about the environment. Exploitation exploits 
 Prediction: evaluate the future, given a policy
 
 Control: optimise the future, find the best policy
+ 
