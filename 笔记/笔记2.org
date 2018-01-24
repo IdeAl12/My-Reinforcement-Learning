@@ -133,6 +133,17 @@ reuse:布尔型，是否重复使用参数
       name=None,
       reuse=None
   )
+  e.g
+  conv1 = tf.layers.conv2d(batch_images, 
+                           filters=64,
+                           kernel_size=7,
+                           strides=2,
+                           activation=tf.nn.relu,
+                           kernel_initializer=tf.TruncatedNormal(stddev=0.01)
+                           bias_initializer=tf.Constant(0.1),
+                           kernel_regularizer=tf.contrib.layers.l2_regularizer(0.003),
+                           bias_regularizer=tf.contrib.layers.l2_regularizer(0.003),
+                           name='conv1')
 #+END_SRC
 inputs: 输入数据，4维tensor.
 
