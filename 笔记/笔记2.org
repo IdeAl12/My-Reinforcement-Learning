@@ -42,4 +42,29 @@ tf.placeholder(dtype, struct, name)
 当需要共享变量的时候，需要使用tf.get_variable。在其他情况下，这两个的用法是一样的。
 
 本质区别：tf.Variable每次都在创建新对象，所有reuse和它并没有关系。对于get_variable,如果已经存在变量对象。就返回这个对象，如果没有不存在对象，就创建一个新的。
+** tf.matmul
+Multiplies matrix a by matrix b, producing a*b.
+** 池化层pooling和全连接层dense
+1.最大池化层max_pooling2d（一般放在卷积层之后）
+#+BEGIN_SRC python
+  tf.max_pooling2d(
+      inputs,
+      pool_size,
+      strides,
+      padding='valid',
+      data_format='channels_last',
+      name=None
+  )
+  e.g
+  pool1=tf.layers.max_pooling2d(inputs=x, pool_size=[2,2], strides=2)
+#+END_SRC
+inputs:进行池化的数据。
 
+pool_size:池化的核大小[pool_height, pool_width],如果长宽相等，可直接设置为一个数。
+
+strides:池化的滑动步长，可设置为[1,1]或一个数。
+
+padding:边缘填充，'same'和'valid'选其一，默认为valid。
+
+data_format:输入数据格式，默认为channels_last,即(batch, height, width, channels)
+也可以设置为channels_first 对应 (batch, channels, height, width)。
