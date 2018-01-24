@@ -68,3 +68,31 @@ padding:边缘填充，'same'和'valid'选其一，默认为valid。
 
 data_format:输入数据格式，默认为channels_last,即(batch, height, width, channels)
 也可以设置为channels_first 对应 (batch, channels, height, width)。
+2.均值池化average_pooling2d
+#+BEGIN_SRC python
+  tf.layers.average_pooling2d(
+      inputs,
+      pool_size,
+      strides,
+      padding='valid',
+      data_fromat='channels_last',
+      name=None
+  )
+#+END_SRC
+3.全连接层dense
+
+#+BEGIN_SRC python
+  tf.layers.dense(inputs,
+                  units,
+                  activation=None,
+                  use_bias=True,
+                  kernel_initializer=None,
+                  bias_initializer=tf.zeros_initializer(),
+                  kernal_regularizer=None,
+                  bias_regularizer=None,
+                  activity_regularizer=None,
+                  trainable=True,
+                  name=None,
+                  reuse=None
+  )
+#+END_SRC
