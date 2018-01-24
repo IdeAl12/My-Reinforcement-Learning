@@ -16,3 +16,30 @@ pip3 install numpy(pandas)
      print("size:", array.size)
    #+END_SRC
  
+* tensorflow 
+** placeholder
+tf.placeholder(dtype, struct, name)
+第一个是要保存的数据的类型，多数为tf.float32，第二个参数是要保存的数据的结构,e.p [1,2]。在session运行阶段，需要给placeholder提供数据，利用feed_dict的字典给placeholder变量提供数据。
+
+[None, 3]表示列为3，行不定
+** variable_scopen 和get_variable:
+
+   #+BEGIN_SRC python
+     with tf.variable_scope('scope') as scope1:
+         weight1 = tf.get_variable('weights', shape=[2,3])
+         bias = tf.get_variable('bias', shape=[3])
+     # 共享已经定义好的变量：
+     with tf.variable_scope('scope', reuse=True) as scope2:
+         weight2 =tf.get_variable('weights')
+
+     # 这两个引用名称指向的是同一个内存对象
+   #+END_SRC
+** tf.Variable 和 tf.get_variable
+使用tf.Variable时，如果检测到命名冲突，系统会自己处理。
+
+使用tf.get_variable时，系统不会处理冲突，而会报错。
+
+当需要共享变量的时候，需要使用tf.get_variable。在其他情况下，这两个的用法是一样的。
+
+本质区别：tf.Variable每次都在创建新对象，所有reuse和它并没有关系。对于get_variable,如果已经存在变量对象。就返回这个对象，如果没有不存在对象，就创建一个新的。
+
