@@ -176,3 +176,19 @@ activity_regularizer: 输出的正则化函数.
 trainable: Boolean型，表明该层的参数是否参与训练。如果为真则变量加入到图集合中 GraphKeys.TRAINABLE_VARIABLES (see tf.Variable).
 
 reuse: Boolean型, 是否重复使用参数.
+** 求lost(cost)的几种方法
+Cross-Entropy cost funtion(Negatve log-likehood function)
+一般在softmax函数之后使用negative log-likehood作为代价函数
+
+#+BEGIN_SRC python
+  1.
+  y = tf.nn.softmax(tf.matmul(x, W) + b)
+  cross_entropy = - tf.reduce_sum(y_*tf.log(y))
+  2.
+  cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits,
+                                                          onehot_labels,
+                                                          name='xentropy')
+  loss = tf.reduce_mean(cross_entropy, name=''xentropy_mean)
+  # onehot——labels需要对样本类别标签进行onehot编码
+
+#+END_SRC
