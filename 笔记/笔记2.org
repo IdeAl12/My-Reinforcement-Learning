@@ -318,6 +318,42 @@ s(square);p(pentagon);*(star);h(hexagon1六边形);H(hexagon2);
 
 #+BEGIN_SRC python
   plt.plot(x,z,label="cos(x^2)")
+  plt.legend()
 #+END_SRC
+常规：
+
+#+BEGIN_SRC python
+  pl.legend([plot1, plot2], (’red line’, ’green circles’), ’best’, numpoints=1)# make legend
+#+END_SRC
+*** Histograms 直方图
+
+    #+BEGIN_SRC python
+      import numpy as np
+      import pylab as pl
+       
+      # make an array of random numbers with a gaussian distribution with
+      # mean = 5.0
+      # rms = 3.0
+      # number of points = 1000
+      data = np.random.normal(5.0, 3.0, 1000)
+       
+      # make a histogram of the data array
+      pl.hist(data)
+      # 若不想要黑色轮廓：
+      # pl.hist(data, histtype='stepfilled')
+      # make plot labels
+      pl.xlabel(’data’)
+      pl.show()
+    #+END_SRC
 
 
+
+*** 对LaTex数学公式的支持
+在字符串前后添加$符号，matplotlib就回使用内嵌的latex引擎绘制数学公式
+*** 对数坐标轴
+
+    #+BEGIN_SRC python
+      ax.semilogx(x,y) #x轴为对数坐标轴
+      ax.semilogy(x,y) #y轴为对数坐标轴
+      ax.loglog(x,y) #双对数坐标轴
+    #+END_SRC
