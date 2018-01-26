@@ -251,3 +251,25 @@ subpolt将整个绘图区域等分为numRows行*numCols列个子区域，按照�
        pl.plot(x, y)# use pylab to plot x and y
        pl.show()# show the plot on the screen
      #+END_SRC
+**** Scatter  plots 散点图
+
+     #+BEGIN_SRC python
+       pl.plot(x, y, 'o')
+     #+END_SRC
+*** 美化
+**** 线条颜色
+
+     #+BEGIN_SRC python
+       pl.plot(x, y, 'or')
+     #+END_SRC
+b(blue);g(green);r(red);c(cyan);m(magenta洋红色);y(yellow);k(black);w(white)
+**** 虚线
+
+     #+BEGIN_SRC python
+       pl.plot(x,y,'--')
+     #+END_SRC
+**** marker样式
+s(square);p(pentagon);*(star);h(hexagon1六边形);H(hexagon2);
+
++(plus);x(x marker);D(diamond);d(thin diamond)
+
