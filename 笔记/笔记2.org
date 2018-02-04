@@ -203,7 +203,6 @@ horizontal stack:左右合并
   """
 #+END_SRC
 
-
 * tensorflow 
 ** placeholder
 tf.placeholder(dtype, struct, name)
@@ -233,7 +232,7 @@ tf.placeholder(dtype, struct, name)
 ** tf.matmul
 Multiplies matrix a by matrix b, producing a*b.
 ** 池化层pooling,全连接层dense和卷积层conv
-1.最大池化层max_pooling2d（一般放在卷积层之后）
+*** 1.最大池化层max_pooling2d（一般放在卷积层之后）
 
 #+BEGIN_SRC python
   tf.max_pooling2d(
@@ -257,7 +256,7 @@ padding:边缘填充，'same'和'valid'选其一，默认为valid。
 
 data_format:输入数据格式，默认为channels_last,即(batch, height, width, channels)
 也可以设置为channels_first 对应 (batch, channels, height, width)。
-2.均值池化average_pooling2d
+*** 2.均值池化average_pooling2d
 
 #+BEGIN_SRC python
   tf.layers.average_pooling2d(
@@ -269,7 +268,7 @@ data_format:输入数据格式，默认为channels_last,即(batch, height, width
       name=None
   )
 #+END_SRC
-3.全连接层dense
+*** 3.全连接层dense
 
 #+BEGIN_SRC python
   tf.layers.dense(inputs,
@@ -304,7 +303,7 @@ kernel_regularizer:卷积核的正则化
 trainable:布尔型，该层是否参加训练，为真则变量加入到图集和中
 
 reuse:布尔型，是否重复使用参数
-4.卷积层conv
+*** 4.卷积层conv
 
 #+BEGIN_SRC python
   tf.nn.conv2d(
@@ -418,6 +417,7 @@ subpolt将整个绘图区域等分为numRows行*numCols列个子区域，按照�
   plt.show()
 
 #+END_SRC
+
 
 
 ** pylab快速绘图
