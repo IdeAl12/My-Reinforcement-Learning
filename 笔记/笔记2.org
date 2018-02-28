@@ -545,3 +545,210 @@ s(square);p(pentagon);*(star);h(hexagon1六边形);H(hexagon2);
       ax.semilogy(x,y) #y轴为对数坐标轴
       ax.loglog(x,y) #双对数坐标轴
     #+END_SRC
+* python
+** isinstance
+isinstance 是Python中的一个内建函数，用来判断一个对象的变量类型。
+语法：
+
+#+BEGIN_SRC python
+  isinstance(object, classinfo)
+#+END_SRC
+
+如果参数object是classinfo的实例，或者object是classinfo类的子类的一个实例，返回true。
+** assert
+assert断言是声明其布尔值必须为真的判定，如果发生异常说明表达式为假
+语法：
+
+#+BEGIN_SRC python
+  assert expression
+
+#+END_SRC
+
+等价于：
+ #+BEGIN_SRC python
+    if not expression:
+        raise AssertionError
+  #+END_SRC
+
+* Theano
+** Why theano?
+1. tensowflow目前只能在MacOS和Linux，theano还可以在Windows下运行。
+2. theano可以使用GPU进行运算，用GPU比CPU快100倍左右。
+3. tensowflow比较商业化，theano比较学术性
+** 基本用法
+
+   #+BEGIN_SRC python
+     import numpy as np
+     import theano.rensor as T
+     from theano import function
+     #定义X和Y两个常量scalar，结构建立好后，把结构放在function，再把数据放在function
+     #basic
+     x = T.dscalar('x') #建立x的容器
+     y = T.dscalar('y') #建立y的容器
+     z = x + y #建立方程
+
+     # 使用function定义theano的方程
+     # 将输入值x，y放在[]里，输出值z放在后面
+     f = funxtion([x, y], z)
+
+     print(f(2, 3))
+
+   #+END_SRC
+
+使用theano中的pp(pretty-print)可以打印出原始方程
+
+
+#+BEGIN_SRC python
+  from theano import pp
+  print(pp(z))
+  # (x + y)
+#+END_SRC
+
+定义矩阵，以及利用矩阵做相关的运算
+
+
+#+BEGIN_SRC python
+  x = T.dmatrix('x')  # 矩阵 x 的容器
+  y = T.dmatrix('y')  # 矩阵 y 的容器
+  z = x + y   # 定义矩阵加法
+  f = function([x, y], z) # 定义方程
+
+  print(f(
+      np.arange(12).reshape((3,4)),
+      10*np.ones((3,4))
+  )
+  )
+  """
+  [[ 10.  11.  12.  13.]
+   [ 14.  15.  16.  17.]
+   [ 18.  19.  20.  21.]]
+  """
+#+END_SRC
+** Function用法
+首先导入所需要的python包：
+
+#+BEGIN_SRC python
+  import numpy as np
+  import theano.tensor as T
+  import theano
+#+END_SRC
+
+*** 激励函数例子activation function
+
+    #+BEGIN_SRC python
+      #首先定义一个tensor T：
+      x = T.dmatrix('x')
+
+      #然后声明概率计算方式，要用theano里的计算方式，不能使用numpy里的
+      s = 1/(1+T.exp(-x))
+
+      #最后调用theeano定义的计算函数logistic
+      logistic = theano.function([x], s)
+      print(logistic([0, 1], [-2, -3]))
+      """
+      [[ 0.5         0.73105858]
+       [ 0.26894142  0.11920292]]
+      """
+    #+END_SRC
+
+*** 多输入/输出的function
+
+    #+BEGIN_SRC python
+      #假定输入和输出是两个，指定输入的值是矩阵a，b
+      a,b = T.dmatrics('a', 'b')
+
+      #diff:差； abs_diff:差的绝对值； diff_squared：差的平方
+      diff = a-b
+      abs_diff = abs(diff)
+      diff_squared = diff**2
+
+      #在这次使用theano.function的时候可以指定两个输，并且输出这两个数值的差（diff），差的绝对值（abs_diff）， 差的平方（diff_squared）。当我们在调用这个函数的时候会将这三个结果作为输出值。
+      f = theano.function([a, b], [diff, abs_diff, diff_squared])
+
+      x1,x2,x3= f(
+          np.ones((2,2)), # a
+          np.arange(4).reshape((2,2))  # b
+      )
+      print(x1, x2, x3)
+
+      """
+      array([[ 1.,  0.],
+             [-1., -2.]]),
+      array([[ 1.,  0.],
+             [ 1.,  2.]]),
+      array([[ 1.,  0.],
+
+             [ 1.,  4.]])
+      """
+    #+END_SRC
+
+*** function的名字
+
+    #+BEGIN_SRC python
+      #首先定义三个纯量的容器，以及输出值z
+      x,y,w = T.dscalars('x','y','w')
+      z = (x+y)*w
+
+      #默认值的书写方式：
+      f = theano.function([x,
+                           theano.In(y, value=1),
+                           theano.In(w,value=2)],
+                          z)
+
+      print(f(23))    # 使用默认
+      print(f(23,1,4)) # 不使用默认
+      """
+      48.0
+      100.0
+      """
+
+      #指定参数的名字：
+      f = theano.function([x,
+                           theano.In(y, value=1),
+                           theano.In(w,value=2,name='weights')],
+                          z)
+
+      print (f(23,1,weights=4)) ##调用方式
+
+      """
+      100.0
+      """
+    #+END_SRC
+** Shared变量
+Shared变量：这些变量可以在运算过程中，不停地进行交换和更新。在定义weights和bias时需要用到
+*** 定义
+
+    #+BEGIN_SRC python
+      state = theano.shared(np.array(0, dtype = np.float64), 'state')#inital state = 0
+    #+END_SRC
+要用np.array赋初值，初始值是0，并且要规定好数据类型。
+数据类型很重要，在后面定义vector或matrix的时候，一定要统一。
+
+
+#+BEGIN_SRC python
+  #下面是累加值，定义它的名字为 inc，还有它的数据类型，调用 state.dtype，而不是写 dtype=np.float64， 否则会报错。
+  inc = T.scalar('inc', dtype=state.dtype)
+
+  #接下来是要定义一个 accumulator 函数，它的输入参数为 inc，结果就是输出 state，累加的过程叫做 updates，就是要把现在的 state 变成 state+inc 。
+  accumulator = theano.function([inc], state, updates=[(state, state+inc)])
+#+END_SRC
+
+*** 提取使用
+打印不能直接使用print(accumulator(10)),这样输入的，第一次就是初始值0，下一次输出的时候才能输出10.
+
+#+BEGIN_SRC python
+  # to get variable value
+  print(state.get_value())
+  # 0.0
+
+  accumulator(1)   # return previous value, 0 in here
+  print(state.get_value())
+  # 1.0
+
+  accumulator(10)  # return previous value, 1 in here
+  print(state.get_value())
+  # 11.0
+  #get_value可以用来提取参数的值
+  #set_value可以用来重新设置参数
+  #get_value和set_value只能在share变量的时候调用
+#+END_SRC
