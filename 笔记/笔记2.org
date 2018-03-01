@@ -752,3 +752,191 @@ Shared变量：这些变量可以在运算过程中，不停地进行交换和�
   #set_value可以用来重新设置参数
   #get_value和set_value只能在share变量的时候调用
 #+END_SRC
+* Lasagne
+** 简述
+Lasagne是一个基于Theano的轻量级的神经网络库，就是对Theano库的上层封装，使用起来更简单，但是灵活性下降。
+Lasagne设计的六个原则是简洁、透明、模块化、使用、聚焦和专注。
+官网地址：http://lasagne.readthedocs.io/en/latest/index.html
+GitHub： https://github.com/Lasagne/Lasagne
+
+** Tutorial
+*** Loading data
+采用python语法处理数据，不再赘述
+*** Building the model
+Lasagne的网络模型建立方法和torch比较相似，都是对各种常用的网络层进行了封装，只需要调用相应的网络层函数并把他们搭接在一起即可。
+**** 多层感知机
+构建一个两个隐藏层的多层感知机为例，并对输入增加20%的dropout，隐藏层增加50%的dropout
+***** 输入层
+输入层采用InputLayer定义，InputLayer只用于接收数据，不对数据做任何处理，类似于tensorflow里的placeholder功能。
+
+#+BEGIN_SRC python
+  l_in = lasagne.layer.InputLayer(shape=(None, 1, 28, 28), input_var=input_var)
+#+END_SRC
+
+shape里对应的四个参数分别表示：(batchsize, channels, rows, columns), input_var表示需要连接到输入层的theano变量，默认为none
+
+然后对输入数据加20%的dropout，采用DropoutLayer进行定义：
+
+#+BEGIN_SRC python
+  l_in_drop = lasagne.layers.DropoutLayer(l_in, p=0.2)
+#+END_SRC
+
+p=0.2表示dropout的比例。DropoutLayer也属于layers里的一个组件，也可以简写为dropout。
+
+***** 隐藏层
+这里的隐藏层由全连接层、激活层、dropout层组成。lasagne将全连接层和激活层封装到一个函数里，即DenseLayer。
+
+#+BEGIN_SRC python
+  l_hid1 = lasagne.layers.DenseLayer(
+      l_in_drop, num_units=800,
+      nonlinearity=lasagne.nonlinearities.rectify,
+      W=lasagne.init.GlorotUniform()
+  )
+#+END_SRC
+
+num_units表示全连接层的单元数目，nonlinearity用以定义激活层函数，封装在lasagne.nonlinearities中，这里选择的是ReLU函数。
+
+网络参数的初始化封装在lasagne.init里，只需要分别调用就可以了。
+
+之后添加50%的dropout：
+
+#+BEGIN_SRC python
+  l_hid1_drop = lasagne.layers.DropoutLayer(l_hid1, p=0.5)
+#+END_SRC
+
+第二个隐藏层类似，不再赘述。
+***** 输出层
+输出层依然是一个全连接网络，不同的是这里是做分类任务，所以要将非线性函数/激活函数修改为softmax：
+
+#+BEGIN_SRC python
+  l_out = lasagne.layers.DenseLayer(
+      l_hid2_drop, num_units=10,
+      nonlinearity=lasagne.nonlinearities.softmax
+  )
+#+END_SRC
+
+**** 卷积神经网络
+建立一个含有两个卷积层的神经网络。包括输入层、两个卷积层、全连接层、输出层。
+***** 输入层
+同上。
+***** 卷积层
+卷积层采用Conv2DLayer进行定义：
+
+#+BEGIN_SRC python
+  network = lasagne.layers.Conv2DLayer(
+      network,
+      num_filters=32,
+      filter_size=(5, 5),
+      nonlinearity=lasagne.nonlinearities.rectify,
+      W=lasagne.init.glorotUniform()
+  )
+#+END_SRC
+
+num_filters表示卷积核的数目，filter_size表示卷积核的大小，其余与DenseLayer类似。
+
+一般情况，会在卷积层后加上pooling层，其中maxpool采用函数MaxPool2DLayer进行定义：
+
+#+BEGIN_SRC python
+  network = lasagne.layers.MaxPool2DLayer(network, pool_size=(2, 2))
+#+END_SRC
+
+也可以采用Pool2DLayer定义meanPool。
+*** Training the model
+和一般的深度学习框架类似，需要定义训练模型，包括：损失函数、更新/优化函数等。
+
+在lasagne里，或者说实在theano里，一般是将网络模型、训练模型整合在一块定义一个function，
+然后再将训练数据/测试数据作为函数的自变量输入导函数中，而输入数据通过tensor来定义，，网络参数通过shared来更新并保存。
+**** 数据准备
+通过theano里的tensor进行定义：
+
+#+BEGIN_SRC python
+  #prepare theano variables for inputs and targets
+  input_var = T.tensor4('inputs')
+  target_var = T.ivector('targets')
+#+END_SRC
+
+这两个变量作为训练函数的自变量，在实际训练时只需要将真实的训练数据带入函数中即可。
+**** 损失和更新函数定义
+通过lasagne.objectives里的损失函数来定义不同的损失函数：
+
+#+BEGIN_SRC python
+  prediction = lasagne.layers.get_output(network)
+  loss = lasagne.objectives.categorical_crossentropy(prediction, target_var)
+  loss = loass.mean()
+#+END_SRC
+
+这里network是前面定义的网络模型，prediction表示网络模型的输出表达式。
+
+验证集合测试集上的定义与此类似，知识需要更改deterministic为deterministic=True，这样会屏蔽掉所有的dropout层：
+
+#+BEGIN_SRC python
+  test_prediction = lasagne.layers.get_out(network, deterministic=True)
+  test_los = lasagne.objectives.categorical_crossentropy(test_prediction, target_var)
+  test_loss = test_loss.mean()
+#+END_SRC
+
+定义网络训练与参数更新方法的表达式，一般采用Stochastic Gradient Descent(SGD) with Nesterov momentum,即nesterov_momentum:
+第一步需要先获取所有的网络参数，然后产生更新参数的更新表达式。
+#+BEGIN_SRC python
+  params = lasagne.layers.get_all_params(network, trainable=True)
+  updates = lasagne.updates.nesterov_momentum(
+      loss, params, learning_rate=0.01, momentum=0.9
+  )
+#+END_SRC
+
+**** Compilation
+最后，基于前面的表达式定义一步训练函数：
+
+#+BEGIN_SRC python
+  train_fn = theano.function([input_var, target_var], loss, updates=updates)
+#+END_SRC
+
+这个函数是告诉Theano生成一个训练函数，接收两个输入input_var, target_var,然后计算trainning loss并返回,之后利用updates表达式更新参数。
+
+如果是用于验证和测试，就不需要进行网络参数的更新：
+
+#+BEGIN_SRC python
+  val_fn = theano.function([input_var, target_var], [test_loss, test_acc])
+#+END_SRC
+
+对于测试精度，采用下面定义：
+
+
+#+BEGIN_SRC python
+  test_acc = T.mean(T.eq(T.argmax(test_prediction, axis=1), target_var),
+                    dtype=theano.config.floatX)
+#+END_SRC
+
+
+**** 循环训练
+
+     #+BEGIN_SRC python
+       for epoch in range(num_epochs):
+           # In each epoch, we do a full pass over the training data:
+           train_err = 0
+           train_batches = 0
+           start_time = time.time()
+           for batch in iterate_minibatches(X_train, y_train, 500, shuffle=True):
+               inputs, targets = batch
+               train_err += train_fn(inputs, targets)
+               train_batches += 1
+
+           # And a full pass over the validation data:
+           val_err = 0
+           val_acc = 0
+           val_batches = 0
+           for batch in iterate_minibatches(X_val, y_val, 500, shuffle=False):
+               inputs, targets = batch
+               err, acc = val_fn(inputs, targets)
+               val_err += err
+               val_acc += acc
+               val_batches += 1
+
+           # Then we print the results for this epoch:
+           print("Epoch {} of {} took {:.3f}s".format(
+               epoch + 1, num_epochs, time.time() - start_time))
+           print("  training loss:\t\t{:.6f}".format(train_err / train_batches))
+           print("  validation loss:\t\t{:.6f}".format(val_err / val_batches))
+           print("  validation accuracy:\t\t{:.2f} %".format(
+               val_acc / val_batches * 100))
+     #+END_SRC
